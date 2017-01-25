@@ -1,0 +1,62 @@
+<html>
+  <head>
+    <title> Albero con javascript </title>
+    <script type="text/javascript" src="tris.js"></script>
+    <script type="text/javascript" src="albero.js"></script>
+
+    <script type="text/javascript">
+      function disegna(campo) {              /* Costruisce la tabella di gioco in stile table HTML */
+        var stringaHTML = "<table>";
+        
+        for (var i = 0; i < 3; i++) {
+          stringaHTML += "<tr>";
+          for (var j = 0; j < 3; j++) {
+            stringaHTML += "<td>"+campo[i][j]+"</td>";
+          }
+          stringaHTML += "</tr>";
+        }
+        
+        stringaHTML += "</table>";
+        
+        return stringaHTML;
+      
+      }
+    
+    
+      var alberoHTML = "";
+
+      function drawNode(node) {
+        p = 1;
+        temp = node;
+        while (temp.parent != null) {
+          p++;
+          temp = temp.parent;
+        }
+        alberoHTML += "<div style='position:relative;left:"+(p*25)+"px;' >"+disegna(node.campo)+"</div>";
+        //alert(node.campo);
+        for (var i = 0; i < node.sons.length; i++)
+          drawNode(node.sons[i]);
+
+      }
+      
+      var root = new node();
+        inizializza(root.campo);
+        root.mossa = 1;
+        
+        addNode(root);
+        
+      function scrivi() {
+        document.getElementById('risposta').innerHTML = alberoHTML;
+      
+      }//onload="drawNode(root);scrivi();"
+
+    </script>
+
+  </head>
+  
+  <body onload="assegnaPunteggio(root);">
+  
+    <div id="risposta"></div>
+  </body>
+  
+</html>

@@ -1,0 +1,224 @@
+<html>
+  <head>
+    <title> javascript TRIS </title>
+    <script type="text/javascript">
+
+      var campo = new Array();      /* Creazione del campo di gioco */
+      campo[0] = new Array();   /* come matrice 3x3             */
+      campo[1] = new Array();   /* 'V' per le celle vuote       */
+      campo[2] = new Array();   /* 'O' e 'X' per i giocatori    */
+      
+      var partita = 'IC';
+      /* La variabile partita contiene lo stato della partita e può avere 4 valori:
+         'IC' = partita in corso
+         'VX' = vince il giocatore 1 
+         'VO' = vince il giocatore 2
+         'PA' = la partita è finita ed è pari
+      */
+      
+      var mossa = 1; /* numero mosse */
+      
+      
+      function inizializza() {
+        for (var i = 0; i < 3; i++)   /* Assegno il simbolo 'V' */
+          for (var j = 0; j < 3; j++) /* a tutte le celle vuote */
+            campo[i][j] = 'V';
+        partita = 'IC';
+      }
+      
+      
+      function player1 (x,y) {    /* Giocatore 1 ha X e Giocatore 2 ha O */
+        if ( (campo[x][y] == 'V') && (partita == 'IC') ) {campo[x][y] = 'X';mossa++;}
+      }
+      
+      function player2 (x,y) {
+        if ( (campo[x][y] == 'V') && (partita == 'IC') ) {campo[x][y] = 'O';mossa++;}
+      }
+      
+      
+      function controllo() {
+        
+      
+        var QX = 0; /* Conta il num di X allineate */
+        var QO = 0; /* Conta il num di O allineate */
+        
+        for (var i = 0; i < 3; i++) {         /* Controllo allineamenti verticali */
+          QX = 0;
+          QO = 0;
+          for (var j = 0; j < 3; j++) {
+            if ( campo[i][j] == 'X' ) QX++;
+            if ( campo[i][j] == 'O' ) QO++;
+          }
+          
+          if (QX == 3) {partita = 'VX';return;}
+          if (QO == 3) {partita = 'VO';return;}
+        }
+        
+        
+        
+        for (var j = 0; j < 3; j++) {         /* Controllo allineamenti orizzontali */
+          QX = 0;
+          QO = 0;
+          for (var i = 0; i < 3; i++) {
+            if ( campo[i][j] == 'X' ) QX++;
+            if ( campo[i][j] == 'O' ) QO++;
+          }
+          if (QX == 3) {partita = 'VX';return;}
+          if (QO == 3) {partita = 'VO';return;}
+        }
+        
+        
+        
+       QX = 0;          /* Controllo allineamenti obliqui da alto sx a basso dx */
+       QO = 0;
+       var j = 0;
+       for (var i = 0; i < 3; i++) {
+          if ( campo[i][j] == 'X' ) QX++;
+          if ( campo[i][j] == 'O' ) QO++;
+          j++;
+        }          
+       
+        if (QX == 3) {partita = 'VX';return;}
+        if (QO == 3) {partita = 'VO';return;} 
+        
+       QX = 0;          /* Controllo allineamenti obliqui da basso sx a alto dx */
+       QO = 0;
+       var j = 0;
+       for (var i = 2; i >= 0 ; i--) {
+          if ( campo[i][j] == 'X' ) QX++;
+          if ( campo[i][j] == 'O' ) QO++;
+          j++;
+        }          
+       
+        if (QX == 3) {partita = 'VX';return;}
+        if (QO == 3) {partita = 'VO';return;} 
+        
+        if (mossa == 10) {partita = 'PA';return;} 
+
+      }
+      
+      
+      function disegna() {              /* Costruisce la tabella di gioco in stile table HTML */
+        var stringaHTML = "<table>";
+        
+        for (var i = 0; i < 3; i++) {
+          stringaHTML += "<tr>";
+          for (var j = 0; j < 3; j++) {
+          if(campo[i][j] != 'V') 
+            stringaHTML += "<td class='X"+i+" Y"+j+"' style='color:"+(((campo[i][j])=="X")?"blue":"red")+";' >"+campo[i][j]+"</td>";
+          else 
+            stringaHTML += "<td class='X"+i+" Y"+j+"' onclick='gioca_PvP("+i+","+j+");' style='cursor:pointer;' >&nbsp;&nbsp;&nbsp;</td>";
+          }
+          stringaHTML += "</tr>";
+        }
+        
+        stringaHTML += "</table>";
+        
+        return stringaHTML;
+      
+      }
+      
+      function disegnaHTML() {
+        document.getElementById('tavolo').innerHTML = disegna();
+        //alert(disegna());
+      
+      }
+      
+      function gioca_PvP (x, y) { /* Giocatore contro giocatore */
+        if ( (mossa % 2) != 0 ) 
+          player1 (x,y);
+        else
+          player2 (x,y);
+          
+        controllo();
+        disegnaHTML();
+        print_info();
+        
+      
+      }
+      
+      function print_info() {
+      
+        switch (partita) {
+        
+        case 'IC':
+        
+          if ( (mossa % 2) != 0 )
+            document.getElementById('info').innerHTML = "Tocca a X";
+          else
+            document.getElementById('info').innerHTML = "Tocca a O";
+        
+        break;
+        
+        case 'VX':
+          document.getElementById('info').innerHTML = "Vince X";
+          
+        break;
+        
+        case 'VO':
+          document.getElementById('info').innerHTML = "Vince O";
+        
+        break;
+        
+        case 'PA':
+          document.getElementById('info').innerHTML = "Pareggio";
+        
+        break;
+         
+        }
+      }
+      
+
+    </script> 
+    <style>
+    
+    #box {
+  height: 320px;
+  width: 200px;
+  border: 1px dotted black;
+  font-family: cursive;
+  background:url(quaderno.jpg);
+  background-position: right;
+}
+    
+    table {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-collapse: collapse;
+      font-size: 22px;
+      font-family: cursive;
+      opacity: 0.5;
+      }
+    td {
+    padding: 10px;
+      margin:0px;
+    }
+    
+    .X0, .X1 {
+      border-bottom: 2px solid black;
+      
+    }
+    
+    .Y0, .Y1 {
+      border-right: 2px solid black;
+    
+    }
+    </style>
+  </head>
+
+  <body onload="inizializza();disegnaHTML();print_info();">
+    
+    <div id="box">
+    <center> <h3> T R I S </h3> </center>
+    <center id="tavolo">
+  
+    </center>
+    <br/>
+    <center id="info"></center>
+    <br/>
+    <center><a href="javascript:history.back()">menu</a> | <a href="javascript:window.location.reload( false )">nuova partita</a></center>
+    </div>
+  </body>
+
+</html>

@@ -1,0 +1,199 @@
+<html>
+  <head>
+    <title> javascript TRIS </title>
+    <script type="text/javascript" src="tris.js"></script>
+    <script type="text/javascript" src="albero.js"></script>
+    <script type="text/javascript">
+
+     /* variabili globali, già inizializzate:
+        mossa = 1
+        partita = 'IC'
+        campo */
+        
+     inizializza(campo);
+     var matricePunteggi = new Array();
+     matricePunteggi[0] = new Array();
+     matricePunteggi[1] = new Array();
+     matricePunteggi[2] = new Array();
+     
+     
+      
+       function CPU () {    //per il momento CPU gioca solo con X
+        if (partita == 'IC') {
+          var root = new node();
+          duplicaCampo(root.campo, campo);
+          root.mossa = mossa;
+          root.partita = partita;
+          addNode(root);
+          assegnaPunteggio(root);
+          var maxPunteggio = root.sons[0].punteggio;
+          var maxi = 0;
+            for (var i = 0; i < root.sons.length; i++) {
+              matricePunteggi[root.sons[i].x][root.sons[i].y] = root.sons[i].punteggio;
+              /*if (root.sons[i] == 'VX') {
+                maxi = i;
+                break;
+              }*/
+              if (root.sons[i].punteggio > maxPunteggio) {
+                maxPunteggio = root.sons[i].punteggio;
+                maxi = i;
+              }
+            }
+          
+          campo[root.sons[maxi].x][root.sons[maxi].y] = 'O';
+          mossa++; 
+        }  
+      }                                                                   
+      
+      function player (x,y) {
+        if ( (campo[x][y] == 'V') && (partita == 'IC') ) {campo[x][y] = 'X';mossa++;}
+      }
+      
+      
+      
+      function disegna() {              /* Costruisce la tabella di gioco in stile table HTML */
+         var stringaHTML = "<table>";
+        
+        for (var i = 0; i < 3; i++) {
+          stringaHTML += "<tr>";
+          for (var j = 0; j < 3; j++) {
+          if(campo[i][j] != 'V') 
+            stringaHTML += "<td class='X"+i+" Y"+j+"' style='color:"+(((campo[i][j])=="X")?"blue":"red")+";' >"+campo[i][j]+"</td>";
+          else 
+            stringaHTML += "<td class='X"+i+" Y"+j+"' onclick='gioca_PvC("+i+","+j+");' style='cursor:pointer;' >&nbsp;&nbsp;&nbsp;</td>";
+          }
+          stringaHTML += "</tr>";
+        }
+        
+        stringaHTML += "</table>";
+        
+        return stringaHTML;
+      
+      
+      }
+      
+      function disegnaPunteggi() {              /* Costruisce la tabella di gioco in stile table HTML */
+        var stringaHTML = "<table>";
+        
+        for (var i = 0; i < 3; i++) {
+          stringaHTML += "<tr>";
+          for (var j = 0; j < 3; j++) {
+            stringaHTML += "<td>"+matricePunteggi[i][j]+"</td>";
+          }
+          stringaHTML += "</tr>";
+        }
+        
+        stringaHTML += "</table>";
+        
+        return stringaHTML;
+      
+      }
+      
+      function disegnaHTML() {
+        document.getElementById('tavolo').innerHTML = disegna();
+        document.getElementById('punteggi').innerHTML = disegnaPunteggi();
+        //alert(disegna());
+      
+      }
+      
+      function gioca_PvC (x, y) { /* Giocatore contro giocatore */
+         
+        if (campo[x][y] == 'V') {  
+        
+          player (x,y);
+          partita = controllo(campo, mossa);
+          disegnaHTML();
+          print_info();
+          CPU ();
+          
+          partita = controllo(campo, mossa);
+          disegnaHTML();
+          print_info();
+        
+        }
+      }
+      
+      function print_info() {
+      
+        switch (partita) {
+        
+        case 'IC':
+        
+          if ( (mossa % 2) != 0 )
+            document.getElementById('info').innerHTML = "Tocca a X";
+          else
+            document.getElementById('info').innerHTML = "Tocca a O";
+        
+        break;
+        
+        case 'VX':
+          document.getElementById('info').innerHTML = "Vince X";
+          
+        break;
+        
+        case 'VO':
+          document.getElementById('info').innerHTML = "Vince O";
+        
+        break;
+        
+        case 'PA':
+          document.getElementById('info').innerHTML = "Pareggio";
+        
+        break;
+         
+        }
+      }
+      
+
+    </script> 
+    <style>
+    #box {
+  height: 320px;
+  width: 200px;
+  border: 1px dotted black;
+  font-family: cursive;
+  background:url(../quaderno.jpg);
+  background-position: right;
+}
+    table {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-collapse: collapse;
+      font-size: 22px;
+      font-family: cursive;
+      opacity: 0.5;
+      }
+    td {
+    padding: 10px;
+      margin:0px;
+    }
+    
+    .X0, .X1 {
+      border-bottom: 2px solid black;
+      
+    }
+    
+    .Y0, .Y1 {
+      border-right: 2px solid black;
+    
+    }
+    </style>
+  </head>
+
+  <body onload="disegnaHTML();print_info();">
+    <div id="box">
+    <center> <h3> T R I S </h3> </center>
+    <center id="tavolo">
+  
+    </center>
+    <br/>
+    <center id="info"></center>
+    <br/>
+    <center><a href="javascript:history.back()">menu</a> | <a href="javascript:window.location.reload( false )">nuova partita</a></center>
+    </div>
+    
+    <div id="punteggi" style="display:none"></div>
+  </body>
+
+</html>
